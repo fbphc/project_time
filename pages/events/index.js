@@ -3,6 +3,8 @@ import EventList from '../../components/events/events-list';
 import EventsSearch from './events-search';
 import { Fragment } from 'react';
 import { useRouter } from 'next/router';
+import axios from "axios";
+
 
 function AllEventsPage() {
   const events = getAllEvents();
