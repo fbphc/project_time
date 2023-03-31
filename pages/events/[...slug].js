@@ -5,25 +5,32 @@ import EventList from "../../components/events/events-list";
 import ResultsTitle from "../../components/events/results-title";
 import Button from "../../components/ui/button";
 import ErrorAlert from "../../components/ui/error-alert";
+import Head from "next/head";
 
 function FilteredEvents(props) {
   const router = useRouter();
-  console.log(props)
   const filterData = router.query.slug;
 
+  let pageHeadData = (
+    <Head>
+      <title>Filtered Events</title>
+      <meta name="description" content={`All events of filtered Events`} />
+    </Head>
+  );
+
   if (!filterData) {
-    return <p className="center">Loading</p>;
+    return (
+      <Fragment>
+        {pageHeadData}
+        <p className="center">Loading...</p>);
+      </Fragment>
+    );
   }
-
-  const filteredYear = filterData[0];
-  const filteredMonth = filterData[1];
-
-  const numYear = +filteredYear;
-  const numMonth = +filteredMonth;
 
   if (props.hasError) {
     return (
       <Fragment>
+        {pageHeadData}
         <ErrorAlert>
           <p>Invalid filter. Please adjust your values!</p>
         </ErrorAlert>
@@ -33,12 +40,25 @@ function FilteredEvents(props) {
       </Fragment>
     );
   }
-
+  const filteredYear = filterData[0];
+  const filteredMonth = filterData[1];
+  const numYear = +filteredYear;
+  const numMonth = +filteredMonth;
+  pageHeadData = (
+    <Head>
+      <title>Filtered Events</title>
+      <meta
+        name="description"
+        content={`All events for ${numMonth}/${numYear}.`}
+      />
+    </Head>
+  );
   const filteredEvents = props.events;
 
   if (!filteredEvents || filteredEvents.length === 0) {
     return (
       <Fragment>
+        {pageHeadData}
         <ErrorAlert>
           <p>No Events found for the chosen filter!</p>
         </ErrorAlert>
@@ -50,7 +70,7 @@ function FilteredEvents(props) {
   }
 
   const date = new Date(props.date.year, props.date.month - 1);
-  
+
   return (
     <Fragment>
       <ResultsTitle date={date} />
@@ -64,7 +84,7 @@ export async function getServerSideProps(context) {
   const filterData = params.slug;
   const filteredYear = filterData[0];
   const filteredMonth = filterData[1];
-  
+
   const numYear = +filteredYear;
   const numMonth = +filteredMonth;
   if (
@@ -74,12 +94,12 @@ export async function getServerSideProps(context) {
     numYear < 2021 ||
     numMonth > 12 ||
     numMonth < 1
-    ) {
-      return {
-        props: { hasError: true },
-        // notFound: true,
-        // redirect: {
-          //   destination: '/error'
+  ) {
+    return {
+      props: { hasError: true },
+      // notFound: true,
+      // redirect: {
+      //   destination: '/error'
       // }
     };
   }
